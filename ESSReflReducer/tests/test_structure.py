@@ -366,3 +366,35 @@ class TestStructure(unittest.TestCase):
             e.__repr__(),
             '  "instrument": "ESTIA",\n  "measurement": {\n    "angular_range": [\n      0.3,\n      2.1\n    ],\n    "angular_unit": "deg",\n    "omega": 0,\n    "scheme": "Angle and energy dispersive",\n    "wavelength_range": [\n      4.0,\n      12.0\n    ],\n    "wavelength_unit": "Aa"\n  },\n  "probe": {\n    "radiation": "neutron"\n  },\n  "sample": {\n    "name": "My Sample"\n  }',
         )
+
+    def test_datasource_init(self):
+        o = structure.Origin(PERSON, "40208", "An example experiment")
+        e = structure.Experiment(
+            "ESTIA",
+            structure.Probe("neutron"),
+            structure.Measurement(
+                "Angle and energy dispersive", [4.0, 12.0], [0.3, 2.1]
+            ),
+            structure.Sample("My Sample"),
+        )
+        links = {'related extensive file' : 'fulldatafile.hdf',
+                 'instrument reference'   : 'doi:10.1016/j.nima.2016.03.007'}
+        ds = structure.DataSource(o, e, links)
+        assert_equal(ds.origin.owners[0].name, 'Brian')
+        assert_equal(ds.experiment.instrument, 'ESTIA')
+        assert_equal(ds.links, links)
+
+    def test_datasource_print(self):
+        o = structure.Origin(PERSON, "40208", "An example experiment")
+        e = structure.Experiment(
+            "ESTIA",
+            structure.Probe("neutron"),
+            structure.Measurement(
+                "Angle and energy dispersive", [4.0, 12.0], [0.3, 2.1]
+            ),
+            structure.Sample("My Sample"),
+        )
+        links = {'related extensive file' : 'fulldatafile.hdf',
+                 'instrument reference'   : 'doi:10.1016/j.nima.2016.03.007'}
+        ds = structure.DataSource(o, e, links)
+        assert_equal(ds.__repr__(), '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "2021-02-25, 00:00:00",\n    "experiment_id": "40208",\n    "experiment_start": "2021-02-25, 00:00:00",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }')

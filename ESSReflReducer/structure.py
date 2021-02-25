@@ -172,6 +172,18 @@ class Experiment:
         return _repr(self)
 
 
+class DataSource:
+    """
+    """
+    def __init__(self, origin, experiment, links):
+        self.origin = origin
+        self.experiment = experiment
+        self.links = links
+
+    def __repr__(self):
+        return _repr(self)
+        
+
 def _dumping(o):
     try:
         to_return = o.__dict__
