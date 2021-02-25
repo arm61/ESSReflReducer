@@ -1,0 +1,7 @@
+build
+.eggs
+**/.ipynb_checkpoints
+dist
+ESSReflReducer.egg-info
+**.ipynb
+**__pycache__
