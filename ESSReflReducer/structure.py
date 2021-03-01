@@ -1,5 +1,7 @@
 import json
+from pathlib import Path
 from datetime import datetime, date
+from ESSReflReducer import __version__
 
 
 class Structure:
@@ -188,6 +190,7 @@ class DataSource(Structure):
     """
     Information about the source of the data being reduced.
     """
+
     def __init__(self, origin, experiment, links):
         """
         Args:
@@ -204,16 +207,85 @@ class File(Structure):
     """
     File information
     """
+
     def __init__(self, filename, creation_time=None):
         """
         Args:
             filename (str): The path to the file.
             creation_time (datetime.datetime): Date and time of file creation.
         """
-        self.filename = filename
+        self.filename = Path(filename)
         if creation_time is None:
             creation_time = datetime.now()
         self.creation_time = creation_time
+
+    @property
+    def dir(self):
+        """
+        Get the directory of the file.
+
+        Returns:
+            (str): File directory.
+        """
+        return self.filename.parent.as_posix()
+
+    @property
+    def ext(self):
+        """
+        Get the extention of the file.
+
+        Returns:
+            (str): File ext.
+        """
+        return self.filename.suffix
+
+    @property
+    def name(self):
+        """
+        Get the name of the file.
+
+        Returns:
+            (str): File name.
+        """
+        return self.filename.stem
+
+
+class Software(Structure):
+    """
+    Information on the software used.
+    """
+    def __init__(self, script):
+        """
+        Args:
+            script (ESSReflReducer.structure.File): The file for the script used in reduction.
+        """
+        self.name = "ESSReflReducer"
+        self.version = __version__
+        self.script = script
+
+
+class DataState(Structure):
+    """
+    Information about what has been done to the data.
+    """
+    def __init__(self):
+        self.footprint = None
+        self.intensity = None
+        self.resolution = None
+        self.absorption = None
+        self.background = None
+
+
+class Data(Structure):
+    """
+    The structure of the data in the file.
+    """
+    def __init__(self, columns):
+        """
+        Args:
+            columns (dict): A dictionary describing the columns in the data.
+        """
+        self.columns = columns
 
 
 def _dumping(o):
@@ -230,6 +302,8 @@ def _dumping(o):
         to_return = o.strftime("%Y-%m-%d, %H:%M:%S")
     elif isinstance(o, date):
         to_return = o.strftime("%Y-%m-%d")
+    elif isinstance(o, Path):
+        to_return = o.as_posix()
     else:
         try:
             to_return = o.__dict__
@@ -246,7 +320,7 @@ def _repr(class_to_represent):
         class_to_represent (class): The class to be represented.
 
     Returns:
-        (str): A string representation. 
+        (str): A string representation.
     """
     return json.dumps(
         class_to_represent, default=lambda o: _dumping(o), sort_keys=True, indent=2

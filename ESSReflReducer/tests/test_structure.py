@@ -9,7 +9,7 @@ Tests for structure module
 import unittest
 from numpy.testing import assert_almost_equal, assert_equal
 from datetime import datetime, date
-from ESSReflReducer import structure
+from ESSReflReducer import structure, __version__
 
 PERSON = structure.Person("Brian", "A N University")
 TODAY = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
@@ -144,7 +144,11 @@ class TestStructure(unittest.TestCase):
         o = structure.Origin(PERSON, "40208", "An example experiment")
         assert_equal(
             o.__repr__(),
-            '  "experiment_end": "' + TODAY[:-10] + '",\n  "experiment_id": "40208",\n  "experiment_start": "' + TODAY[:-10] + '",\n  "facility": "European Spallation Source",\n  "owners": [\n    {\n      "affiliation": "A N University",\n      "name": "Brian"\n    }\n  ],\n  "title": "An example experiment"',
+            '  "experiment_end": "'
+            + TODAY[:-10]
+            + '",\n  "experiment_id": "40208",\n  "experiment_start": "'
+            + TODAY[:-10]
+            + '",\n  "facility": "European Spallation Source",\n  "owners": [\n    {\n      "affiliation": "A N University",\n      "name": "Brian"\n    }\n  ],\n  "title": "An example experiment"',
         )
 
     def test_layer_init_a(self):
@@ -369,11 +373,13 @@ class TestStructure(unittest.TestCase):
             ),
             structure.Sample("My Sample"),
         )
-        links = {'related extensive file' : 'fulldatafile.hdf',
-                 'instrument reference'   : 'doi:10.1016/j.nima.2016.03.007'}
+        links = {
+            "related extensive file": "fulldatafile.hdf",
+            "instrument reference": "doi:10.1016/j.nima.2016.03.007",
+        }
         ds = structure.DataSource(o, e, links)
-        assert_equal(ds.origin.owners[0].name, 'Brian')
-        assert_equal(ds.experiment.instrument, 'ESTIA')
+        assert_equal(ds.origin.owners[0].name, "Brian")
+        assert_equal(ds.experiment.instrument, "ESTIA")
         assert_equal(ds.links, links)
 
     def test_datasource_print(self):
@@ -386,21 +392,105 @@ class TestStructure(unittest.TestCase):
             ),
             structure.Sample("My Sample"),
         )
-        links = {'related extensive file' : 'fulldatafile.hdf',
-                 'instrument reference'   : 'doi:10.1016/j.nima.2016.03.007'}
+        links = {
+            "related extensive file": "fulldatafile.hdf",
+            "instrument reference": "doi:10.1016/j.nima.2016.03.007",
+        }
         ds = structure.DataSource(o, e, links)
-        assert_equal(ds.__repr__(), '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "' + TODAY[:-10] + '",\n    "experiment_id": "40208",\n    "experiment_start": "' + TODAY[:-10] + '",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }')
+        assert_equal(
+            ds.__repr__(),
+            '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "'
+            + TODAY[:-10]
+            + '",\n    "experiment_id": "40208",\n    "experiment_start": "'
+            + TODAY[:-10]
+            + '",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }',
+        )
 
     def test_file_init_a(self):
-        f = structure.File('test.dat')
-        assert_equal(f.filename, 'test.dat')
+        f = structure.File("test.dat")
+        assert_equal(f.filename.as_posix(), "test.dat")
         assert_equal(f.creation_time.strftime("%Y-%m-%d, %H:"), f"{TODAY[:-5]}")
 
     def test_file_init_b(self):
-        f = structure.File('test.dat', creation_time=datetime(1994, 11, 29, 2, 50, 42))
-        assert_equal(f.filename, 'test.dat')
+        f = structure.File("test.dat", creation_time=datetime(1994, 11, 29, 2, 50, 42))
+        assert_equal(f.filename.as_posix(), "test.dat")
         assert_equal(f.creation_time, datetime(1994, 11, 29, 2, 50, 42))
 
     def test_file_print(self):
-        f = structure.File('test.dat', creation_time=datetime(1994, 11, 29, 2, 50, 42))
-        assert_equal(f.__repr__(), '  "creation_time": "1994-11-29, 02:50:42",\n  "filename": "test.dat"')
+        f = structure.File("test.dat", creation_time=datetime(1994, 11, 29, 2, 50, 42))
+        assert_equal(
+            f.__repr__(),
+            '  "creation_time": "1994-11-29, 02:50:42",\n  "filename": "test.dat"',
+        )
+
+    def test_file_dir(self):
+        f = structure.File("/a/b/test.dat")
+        assert_equal(f.dir, '/a/b')
+
+    def test_file_ext(self):
+        f = structure.File("/a/b/test.dat")
+        assert_equal(f.ext, '.dat')
+
+    def test_file_name(self):
+        f = structure.File("/a/b/test.dat")
+        assert_equal(f.name, 'test')
+
+    def test_software_init(self):
+        s = structure.Software(structure.File("/a/b/test.py"))
+        assert_equal(s.name, "ESSReflReducer")
+        assert_equal(s.version, __version__)
+        assert_equal(s.script.filename.as_posix(), "/a/b/test.py")
+
+    def test_software_print(self):
+        s = structure.Software(structure.File("/a/b/test.py", creation_time=datetime(1994, 11, 29, 2, 50, 42)))
+        assert_equal(s.__repr__(), '  "name": "ESSReflReducer",\n  "script": {\n    "creation_time": "1994-11-29, 02:50:42",\n    "filename": "/a/b/test.py"\n  },\n  "version": "0.0.1"')
+
+    def test_data_state_init_a(self):
+        ds = structure.DataState()
+        assert_equal(ds.footprint, None)
+        assert_equal(ds.intensity, None)
+        assert_equal(ds.resolution, None)
+        assert_equal(ds.absorption, None)
+        assert_equal(ds.background, None)
+
+    def test_data_state_print_a(self):
+        ds = structure.DataState()
+        assert_equal(ds.__repr__(), '  "absorption": null,\n  "background": null,\n  "footprint": null,\n  "intensity": null,\n  "resolution": null')
+
+    def test_data_state_init_b(self):
+        ds = structure.DataState()
+        ds.footprint = 'corrected'
+        ds.intensity = 'normalised'
+        ds.resolution = 'calculated, based on wavelength resolution and detector spatial resolution'
+        ds.absorption = 'uncorrected, not needed'
+        ds.background = 'uncorrected'
+        assert_equal(ds.footprint, 'corrected')
+        assert_equal(ds.intensity, 'normalised')
+        assert_equal(ds.resolution, 'calculated, based on wavelength resolution and detector spatial resolution')
+        assert_equal(ds.absorption, 'uncorrected, not needed')
+        assert_equal(ds.background, 'uncorrected')
+
+    def test_data_state_print_b(self):
+        ds = structure.DataState()
+        ds.footprint = 'corrected'
+        ds.intensity = 'normalised'
+        ds.resolution = 'calculated, based on wavelength resolution and detector spatial resolution'
+        ds.absorption = 'uncorrected, not needed'
+        ds.background = 'uncorrected'
+        assert_equal(ds.__repr__(), '  "absorption": "uncorrected, not needed",\n  "background": "uncorrected",\n  "footprint": "corrected",\n  "intensity": "normalised",\n  "resolution": "calculated, based on wavelength resolution and detector spatial resolution"')
+
+    def test_data_init(self):
+        cols = {"col 1": "qz/Aa-1",
+                "col 2": "Rqz",
+                "col 3": "sigma Rqz , standard deviation",
+                "col 4": "sigma Qz / Aa^-1, standard deviation"}
+        d = structure.Data(cols)
+        assert_equal(d.columns, cols)
+
+    def test_data_print(self):
+        cols = {"col 1": "qz/Aa-1",
+                "col 2": "Rqz",
+                "col 3": "sigma Rqz , standard deviation",
+                "col 4": "sigma qz / Aa^-1, standard deviation"}
+        d = structure.Data(cols)
+        assert_equal(d.columns.__repr__(), "{'col 1': 'qz/Aa-1', 'col 2': 'Rqz', 'col 3': 'sigma Rqz , standard deviation', 'col 4': 'sigma qz / Aa^-1, standard deviation'}")

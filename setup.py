@@ -13,11 +13,9 @@ from setuptools import setup, find_packages
 PACKAGES = find_packages()
 
 # versioning
-MAJOR = 0
-MINOR = 0
-MICRO = 1
+from ESSReflReducer import __version__
 ISRELEASED = False
-VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+VERSION = __version__
 
 
 THIS_DIRECTORY = path.abspath(path.dirname(__file__))
