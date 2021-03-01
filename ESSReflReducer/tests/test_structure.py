@@ -8,11 +8,12 @@ Tests for structure module
 
 import unittest
 from numpy.testing import assert_almost_equal, assert_equal
-from datetime import datetime
+from datetime import datetime, date
 from ESSReflReducer import structure
 
 PERSON = structure.Person("Brian", "A N University")
-TODAY = datetime.now().strftime("%Y-%m-%d")
+TODAY = datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
+TODAY_DATE = date.today()
 
 
 class TestStructure(unittest.TestCase):
@@ -33,7 +34,7 @@ class TestStructure(unittest.TestCase):
         c = structure.Creation(PERSON)
         assert_equal(len(c.owners), 1)
         assert_equal(c.owners[0], PERSON)
-        assert_equal(c.time[:-10], f"{TODAY}")
+        assert_equal(c.time, f"{TODAY}")
         assert_equal(c.system, "dmsc.ess.eu")
 
     def test_creation_init_b(self):
@@ -42,7 +43,7 @@ class TestStructure(unittest.TestCase):
         assert_equal(c.owners[0], PERSON)
         assert_equal(c.owners[1].name, "Colin")
         assert_equal(c.owners[1].affiliation, "European Spallation Source")
-        assert_equal(c.time[:-10], f"{TODAY}")
+        assert_equal(c.time, f"{TODAY}")
         assert_equal(c.system, "dmsc.ess.eu")
 
     def test_creation_init_c(self):
@@ -71,8 +72,8 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
-        assert_equal(o.experiment_start, f"{TODAY}, 00:00:00")
-        assert_equal(o.experiment_end, f"{TODAY}, 00:00:00")
+        assert_equal(o.experiment_start, TODAY_DATE)
+        assert_equal(o.experiment_end, TODAY_DATE)
 
     def test_origin_init_b(self):
         o = structure.Origin(
@@ -85,8 +86,8 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
-        assert_equal(o.experiment_start, f"{TODAY}, 00:00:00")
-        assert_equal(o.experiment_end, f"{TODAY}, 00:00:00")
+        assert_equal(o.experiment_start, TODAY_DATE)
+        assert_equal(o.experiment_end, TODAY_DATE)
 
     def test_origin_init_c(self):
         o = structure.Origin(
@@ -102,8 +103,8 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "Paul Scherrer Institut, SINQ")
-        assert_equal(o.experiment_start, f"{TODAY}, 00:00:00")
-        assert_equal(o.experiment_end, f"{TODAY}, 00:00:00")
+        assert_equal(o.experiment_start, TODAY_DATE)
+        assert_equal(o.experiment_end, TODAY_DATE)
 
     def test_origin_init_d(self):
         o = structure.Origin(
@@ -119,8 +120,8 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
-        assert_equal(o.experiment_start, "1992-07-14, 06:11:20")
-        assert_equal(o.experiment_end, f"{TODAY}, 00:00:00")
+        assert_equal(o.experiment_start, datetime(1992, 7, 14, 6, 11, 20))
+        assert_equal(o.experiment_end, TODAY_DATE)
 
     def test_origin_init_e(self):
         o = structure.Origin(
@@ -136,14 +137,14 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
-        assert_equal(o.experiment_start, f"{TODAY}, 00:00:00")
-        assert_equal(o.experiment_end, "1994-11-29, 02:50:42")
+        assert_equal(o.experiment_start, TODAY_DATE)
+        assert_equal(o.experiment_end, datetime(1994, 11, 29, 2, 50, 42))
 
     def test_origin_print(self):
         o = structure.Origin(PERSON, "40208", "An example experiment")
         assert_equal(
             o.__repr__(),
-            '  "experiment_end": "' + TODAY + ', 00:00:00",\n  "experiment_id": "40208",\n  "experiment_start": "' + TODAY + ', 00:00:00",\n  "facility": "European Spallation Source",\n  "owners": [\n    {\n      "affiliation": "A N University",\n      "name": "Brian"\n    }\n  ],\n  "title": "An example experiment"',
+            '  "experiment_end": "' + TODAY[:-10] + '",\n  "experiment_id": "40208",\n  "experiment_start": "' + TODAY[:-10] + '",\n  "facility": "European Spallation Source",\n  "owners": [\n    {\n      "affiliation": "A N University",\n      "name": "Brian"\n    }\n  ],\n  "title": "An example experiment"',
         )
 
     def test_layer_init_a(self):
@@ -328,15 +329,6 @@ class TestStructure(unittest.TestCase):
         p = structure.Probe("neutron", polarisation=0.97)
         assert_equal(p.__repr__(), '  "polarisation": 0.97,\n  "radiation": "neutron"')
 
-    def test_probe_init_c(self):
-        p = structure.Probe("neutron", energy=12.5)
-        assert_equal(p.radiation, "neutron")
-        assert_almost_equal(p.energy, 12.5)
-
-    def test_probe_print_c(self):
-        p = structure.Probe("neutron", energy=12.5)
-        assert_equal(p.__repr__(), '  "energy": 12.5,\n  "radiation": "neutron"')
-
     def test_experiment_init(self):
         e = structure.Experiment(
             "ESTIA",
@@ -397,18 +389,18 @@ class TestStructure(unittest.TestCase):
         links = {'related extensive file' : 'fulldatafile.hdf',
                  'instrument reference'   : 'doi:10.1016/j.nima.2016.03.007'}
         ds = structure.DataSource(o, e, links)
-        assert_equal(ds.__repr__(), '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "' + TODAY + ', 00:00:00",\n    "experiment_id": "40208",\n    "experiment_start": "' + TODAY + ', 00:00:00",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }')
+        assert_equal(ds.__repr__(), '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "' + TODAY[:-10] + '",\n    "experiment_id": "40208",\n    "experiment_start": "' + TODAY[:-10] + '",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }')
 
     def test_file_init_a(self):
         f = structure.File('test.dat')
         assert_equal(f.filename, 'test.dat')
-        assert_equal(f.creation_time, f"{TODAY}, 00:00:00")
+        assert_equal(f.creation_time.strftime("%Y-%m-%d, %H:"), f"{TODAY[:-5]}")
 
     def test_file_init_b(self):
         f = structure.File('test.dat', creation_time=datetime(1994, 11, 29, 2, 50, 42))
         assert_equal(f.filename, 'test.dat')
-        assert_equal(f.creation_time, f"1994-11-29, 02:50:42")
+        assert_equal(f.creation_time, datetime(1994, 11, 29, 2, 50, 42))
 
     def test_file_print(self):
-        f = structure.File('test.dat')
-        assert_equal(f.__repr__(), '  "creation_time": "2021-03-01, 00:00:00",\n  "filename": "test.dat"')
+        f = structure.File('test.dat', creation_time=datetime(1994, 11, 29, 2, 50, 42))
+        assert_equal(f.__repr__(), '  "creation_time": "1994-11-29, 02:50:42",\n  "filename": "test.dat"')
