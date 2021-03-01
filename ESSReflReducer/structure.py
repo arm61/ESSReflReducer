@@ -182,7 +182,22 @@ class DataSource:
 
     def __repr__(self):
         return _repr(self)
-        
+
+
+class File:
+    """
+    """
+    def __init__(self, filename, creation_time=None):
+        self.filename = filename
+        if creation_time is None:
+            creation_time = datetime.strptime(
+                datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d"
+            )
+        self.creation_time = creation_time.strftime("%Y-%m-%d, %H:%M:%S")
+
+    def __repr__(self):
+        return _repr(self)
+
 
 def _dumping(o):
     try:

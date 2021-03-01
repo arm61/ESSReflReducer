@@ -71,8 +71,8 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
-        assert_equal(o.experiment_start, "2021-02-25, 00:00:00")
-        assert_equal(o.experiment_end, "2021-02-25, 00:00:00")
+        assert_equal(o.experiment_start, f"{TODAY}, 00:00:00")
+        assert_equal(o.experiment_end, f"{TODAY}, 00:00:00")
 
     def test_origin_init_b(self):
         o = structure.Origin(
@@ -120,7 +120,7 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
         assert_equal(o.experiment_start, "1992-07-14, 06:11:20")
-        assert_equal(o.experiment_end, "2021-02-25, 00:00:00")
+        assert_equal(o.experiment_end, f"{TODAY}, 00:00:00")
 
     def test_origin_init_e(self):
         o = structure.Origin(
@@ -136,14 +136,14 @@ class TestStructure(unittest.TestCase):
         assert_equal(o.experiment_id, "40208")
         assert_equal(o.title, "An example experiment")
         assert_equal(o.facility, "European Spallation Source")
-        assert_equal(o.experiment_start, "2021-02-25, 00:00:00")
+        assert_equal(o.experiment_start, f"{TODAY}, 00:00:00")
         assert_equal(o.experiment_end, "1994-11-29, 02:50:42")
 
     def test_origin_print(self):
         o = structure.Origin(PERSON, "40208", "An example experiment")
         assert_equal(
             o.__repr__(),
-            '  "experiment_end": "2021-02-25, 00:00:00",\n  "experiment_id": "40208",\n  "experiment_start": "2021-02-25, 00:00:00",\n  "facility": "European Spallation Source",\n  "owners": [\n    {\n      "affiliation": "A N University",\n      "name": "Brian"\n    }\n  ],\n  "title": "An example experiment"',
+            '  "experiment_end": "' + TODAY + ', 00:00:00",\n  "experiment_id": "40208",\n  "experiment_start": "' + TODAY + ', 00:00:00",\n  "facility": "European Spallation Source",\n  "owners": [\n    {\n      "affiliation": "A N University",\n      "name": "Brian"\n    }\n  ],\n  "title": "An example experiment"',
         )
 
     def test_layer_init_a(self):
@@ -397,4 +397,18 @@ class TestStructure(unittest.TestCase):
         links = {'related extensive file' : 'fulldatafile.hdf',
                  'instrument reference'   : 'doi:10.1016/j.nima.2016.03.007'}
         ds = structure.DataSource(o, e, links)
-        assert_equal(ds.__repr__(), '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "2021-02-25, 00:00:00",\n    "experiment_id": "40208",\n    "experiment_start": "2021-02-25, 00:00:00",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }')
+        assert_equal(ds.__repr__(), '  "experiment": {\n    "instrument": "ESTIA",\n    "measurement": {\n      "angular_range": [\n        0.3,\n        2.1\n      ],\n      "angular_unit": "deg",\n      "omega": 0,\n      "scheme": "Angle and energy dispersive",\n      "wavelength_range": [\n        4.0,\n        12.0\n      ],\n      "wavelength_unit": "Aa"\n    },\n    "probe": {\n      "radiation": "neutron"\n    },\n    "sample": {\n      "name": "My Sample"\n    }\n  },\n  "links": {\n    "instrument reference": "doi:10.1016/j.nima.2016.03.007",\n    "related extensive file": "fulldatafile.hdf"\n  },\n  "origin": {\n    "experiment_end": "' + TODAY + ', 00:00:00",\n    "experiment_id": "40208",\n    "experiment_start": "' + TODAY + ', 00:00:00",\n    "facility": "European Spallation Source",\n    "owners": [\n      {\n        "affiliation": "A N University",\n        "name": "Brian"\n      }\n    ],\n    "title": "An example experiment"\n  }')
+
+    def test_file_init_a(self):
+        f = structure.File('test.dat')
+        assert_equal(f.filename, 'test.dat')
+        assert_equal(f.creation_time, f"{TODAY}, 00:00:00")
+
+    def test_file_init_b(self):
+        f = structure.File('test.dat', creation_time=datetime(1994, 11, 29, 2, 50, 42))
+        assert_equal(f.filename, 'test.dat')
+        assert_equal(f.creation_time, f"1994-11-29, 02:50:42")
+
+    def test_file_print(self):
+        f = structure.File('test.dat')
+        assert_equal(f.__repr__(), '  "creation_time": "2021-03-01, 00:00:00",\n  "filename": "test.dat"')
